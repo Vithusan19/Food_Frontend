@@ -1,101 +1,160 @@
+"use client";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import bgimg from "./Assets/background.png"; 
+import first from "./Assets/firstimg.png"; 
+import second from "./Assets/second.png";
+import menuIcon from "./Assets/menuIcon.png";
+import third from "./Assets/third.jpg";
+import Footer from "./components/Footer";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
+  const [username, setUsername] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const Moveloginpage = () => {
+    router.push("/regLogin/login");
+  };
+  useEffect(()=>{
+    localStorage.removeItem("cart");
+  })
+
+  const Movesignuppage = () => {
+    router.push("/regLogin/signup");
+  };
+  useEffect(() => {
+    const userinfo = localStorage.getItem("userinfo");
+    if (userinfo) {
+      const userData = JSON.parse(userinfo);
+      setUsername(userData.username);
+      if (userData.userRole === "admin") {
+        router.push("/users/admin");
+      } else if (userData.userRole === "user") {
+        router.push("/users/user");
+      }
+    }
+  }, [router]);
+  
+  
+
+  return (
+    <>
+      <div className="container mx-auto bg-white">
+        <nav className="flex justify-between items-center py-4 px-4 md:px-0 relative">
+          <h3 className="text-black font-bold text-2xl md:text-1xl">Uber Eats</h3>
+          {/* Desktop Buttons */}
+          <div className="hidden md:flex gap-4">
+            <button
+              onClick={Moveloginpage}
+              className="bg-white text-black rounded-full py-2 px-4 md:px-6 font-semibold hover:bg-gray-100"
+            >
+              Log in
+            </button>
+            <button
+              onClick={Movesignuppage}
+              className="bg-black text-white rounded-full py-2 px-4 md:px-6 font-semibold hover:bg-gray-800"
+            >
+              Sign up
+            </button>
+          </div>
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden text-black bg-gray-100 p-2 rounded-lg"
+            onClick={() => setMenuOpen(!menuOpen)}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            <Image src={menuIcon} alt="icon" className="bg-cover w-6"/>
+            
+          </button>
+          {/* Mobile Menu */}
+          {menuOpen && (
+            <div className="absolute top-16 right-4 bg-white shadow-lg rounded-lg p-4 flex flex-col gap-4 z-10">
+              <button
+                onClick={Moveloginpage}
+                className="bg-white text-black rounded-full py-2 px-4 font-semibold hover:bg-gray-100"
+              >
+                Log in
+              </button>
+              <button
+                onClick={Movesignuppage}
+                className="bg-black text-white rounded-full py-2 px-4 font-semibold hover:bg-gray-800"
+              >
+                Sign up
+              </button>
+            </div>
+          )}
+        </nav>
+      </div>
+
+      {/* Background Section */}
+      <div className="relative w-full h-[500px] md:h-[900px] flex justify-center items-center">
+        <Image src={bgimg} layout="fill" objectFit="cover" alt="Background" />
+        <div className="absolute inset-0 flex flex-col justify-center items-baseline px-4">
+          <h1 className="text-2xl md:text-4xl text-black font-bold mb-6">
+            Order delivery near you
+          </h1>
+          <form className="flex flex-col md:flex-row w-full max-w-lg gap-2">
+            <input
+              type="text"
+              placeholder="Enter delivery address"
+              className="w-full px-4 py-3 rounded-md border border-gray-300"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
+            <select className="w-full md:w-auto px-4 py-3 rounded-md border border-gray-300">
+              <option value="now">Deliver now</option>
+              <option value="later">Deliver later</option>
+            </select>
+            <button className="w-full md:w-auto bg-black text-white px-6 py-3 rounded-md font-semibold hover:bg-gray-800">
+              Find Food
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Cards Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-16 px-4 md:px-8">
+        <div className="text-center bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-200">
+          <Image
+            src={first}
+            alt="Feed your employees"
+            width={300}
+            height={200}
+            className="rounded-t-lg m-auto w-[300px] sm:w-[400px] md:w-full"
+          />
+          <h3 className="font-bold text-xl mt-4">Feed your employees</h3>
+          <a href="#" className="font-medium hover:underline">
+            Create a business account
           </a>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <div className="text-center bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-200">
           <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+            src={second}
+            alt="Your restaurant, delivered"
+            width={300}
+            height={200}
+            className="rounded-t-lg m-auto w-[300px] sm:w-[400px] md:w-full"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+          <h3 className="font-bold text-xl mt-4">Your restaurant, delivered</h3>
+          <a href="#" className="font-medium hover:underline">
+            Add your restaurant
+          </a>
+        </div>
+        <div className="text-center bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-200">
           <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+            src={third}
+            alt="Deliver with Uber Eats"
+            width={300}
+            height={200}
+            className="rounded-t-lg m-auto w-[300px] sm:w-[400px] md:w-full"
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <h3 className="font-bold text-xl mt-4">Deliver with Uber Eats</h3>
+          <a href="#" className="font-medium hover:underline">
+            Sign up to deliver
+          </a>
+        </div>
+      </div>
+
+      <Footer />
+    </>
   );
 }
