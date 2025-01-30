@@ -1,157 +1,75 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function OrderPage() {
-  // Static JSON data for orders
-  const initialOrders = [
-    {
-      orderid: 1,
-      orderitems: ["Burger", "Fries"],
-      price: 1200,
-      userid: "user1",
-      address: "123 Main Street",
-      status: "Pending",
-    },
-    {
-      orderid: 2,
-      orderitems: ["Pizza", "Coke"],
-      price: 1800,
-      userid: "user2",
-      address: "456 Oak Avenue",
-      status: "Finished",
-    },
-    {
-      orderid: 3,
-      orderitems: ["Pasta", "Garlic Bread"],
-      price: 1500,
-      userid: "user3",
-      address: "789 Pine Road",
-      status: "Pending",
-    },
-    {
-      orderid: 4,
-      orderitems: ["Salad", "Soup"],
-      price: 1000,
-      userid: "user4",
-      address: "321 Elm Street",
-      status: "Pending",
-    },
-    {
-      orderid: 5,
-      orderitems: ["Sushi", "Miso Soup"],
-      price: 2200,
-      userid: "user5",
-      address: "654 Maple Drive",
-      status: "In Progress",
-    },
-    {
-      orderid: 6,
-      orderitems: ["Steak", "Mashed Potatoes"],
-      price: 2500,
-      userid: "user6",
-      address: "876 Birch Lane",
-      status: "Finished",
-    },
-    {
-      orderid: 7,
-      orderitems: ["Chicken Wings", "Beer"],
-      price: 1700,
-      userid: "user7",
-      address: "987 Cedar Road",
-      status: "Pending",
-    },
-    {
-      orderid: 8,
-      orderitems: ["Veggie Burger", "Smoothie"],
-      price: 1400,
-      userid: "user8",
-      address: "543 Spruce Court",
-      status: "Cancelled",
-    },
-    {
-      orderid: 9,
-      orderitems: ["Fish and Chips", "Lemonade"],
-      price: 1600,
-      userid: "user9",
-      address: "123 Willow Way",
-      status: "Finished",
-    },
-    {
-      orderid: 10,
-      orderitems: ["Ramen", "Green Tea"],
-      price: 1900,
-      userid: "user10",
-      address: "321 Cherry Lane",
-      status: "In Progress",
-    },
-    {
-      orderid: 11,
-      orderitems: ["Tacos", "Salsa"],
-      price: 1300,
-      userid: "user11",
-      address: "567 Aspen Street",
-      status: "Pending",
-    },
-    {
-      orderid: 12,
-      orderitems: ["Pancakes", "Coffee"],
-      price: 800,
-      userid: "user12",
-      address: "789 Walnut Avenue",
-      status: "Finished",
-    },
-    {
-      orderid: 13,
-      orderitems: ["Biryani", "Raita"],
-      price: 1500,
-      userid: "user13",
-      address: "654 Cypress Boulevard",
-      status: "In Progress",
-    },
-  ];
+  const [orders, setOrders] = useState([]);
 
-  const [orders, setOrders] = useState(initialOrders);
+  // Fetch orders from the backend
+  useEffect(() => {
+    fetch("http://localhost:8080/api/orders")
+      .then((response) => response.json())
+      .then((data) => setOrders(data))
+      .catch((error) => console.error("Error fetching orders:", error));
+  }, []);
 
   // Filter orders based on their status
-  const pendingOrders = orders.filter((order) => order.status === "Pending");
-  const finishedOrders = orders.filter((order) => order.status === "Finished");
+  const pendingOrders = orders.filter((order) => order.status === "pending");
+  const finishedOrders = orders.filter((order) => order.status === "finished");
 
-  // Calculate the total earnings from finished orders
-  const totalEarnings = finishedOrders.reduce((sum, order) => sum + order.price, 0);
+  // Calculate total earnings from finished orders
+  const totalEarnings = finishedOrders.reduce((sum, order) => sum + order.total, 0);
 
-  // Handle marking an order as finished
-  const handleStatusChange = (orderId) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.orderid === orderId
-          ? { ...order, status: "Finished" }
-          : order
-      )
-    );
+  // Handle status update
+  const handleStatusChange = async (orderId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/orders/${orderId}/status`, {
+        method: "POST", // Change PUT to POST
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (response.ok) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.orderId === orderId ? { ...order, status: "finished" } : order
+          )
+        );
+      } else {
+        console.error("Failed to update status");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   };
+  
 
+  // Render orders
   const renderOrders = (ordersList) =>
     ordersList.map((order) => (
-      <div
-        key={order.orderid}
-        className="grid grid-cols-6 items-center border-b p-4"
-      >
-        <p>{order.orderid}</p>
-        <p>{order.orderitems.join(", ")}</p>
-        <p>LKR {order.price}</p>
+      <div key={order.orderId} className="grid grid-cols-6 items-center border-b p-4">
+        <p>{order.orderId}</p>
+        <p>
+          {order.orderItems.map((item, index) => (
+            <span key={index}>
+              {item.foodName} (x{item.quantity})<br />
+            </span>
+          ))}
+        </p>
+        <p>LKR {order.total}</p>
         <p>{order.userid}</p>
         <p>{order.address}</p>
         <p>
-          {order.status === "Pending" ? (
+          {order.status === "pending" ? (
             <button
-              onClick={() => handleStatusChange(order.orderid)}
+              onClick={() => handleStatusChange(order.orderId)}
               className="bg-black text-white px-4 py-2 font-bold rounded-md hover:bg-gray-600"
             >
               Finish
             </button>
           ) : (
-            <span className="text-green-700 font-bold" >Finished</span>
+            <span className="text-green-700 font-bold">Finished</span>
           )}
         </p>
       </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import foodPlaceholder from "../../../Assets/Food1.png";
+import foodPlaceholder from "../../../Assets/food1.png";
 
 export default function Admin() {
   const [food, setFood] = useState([]);

@@ -24,7 +24,7 @@ export default function Users() {
 
       if (response.ok) {
         const userData = await response.json();
-        const filteredData = userData.filter((user) => user.userRole === "user"); 
+        const filteredData = userData.filter((user) => user.userRole === "user");
         setUsers(filteredData);
         setFilteredUsers(filteredData);
       } else {
@@ -67,9 +67,6 @@ export default function Users() {
   return (
     <div className="flex flex-col bg-gray-100 min-h-screen">
       <div className="p-4">
-        {/* <h1 className="text-2xl font-bold text-center mb-4">User Management</h1> */}
-
-        
         <div className="mb-6 w-[80%] m-auto">
           <input
             type="text"
@@ -81,36 +78,36 @@ export default function Users() {
         </div>
 
         {filteredUsers.length > 0 ? (
-          <div className="flex flex-col space-y-4 w-[80%] m-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-[80%] m-auto">
             {filteredUsers.map((user) => (
               <div
                 key={user.userid}
-                className="flex items-center bg-white p-4 shadow-md rounded-2xl"
+                className="bg-white p-4 shadow-md rounded-2xl flex items-center"
               >
-                <div className="w-40 h-40 mr-4">
+                {/* Left: User Image */}
+                <div className="w-24 h-24 mr-4">
                   <Image
                     src={usericon}
                     alt="User image"
                     width={96}
                     height={96}
-                    className="object-cover rounded-md w-80"
+                    className="object-cover rounded-full"
                   />
                 </div>
+
+                {/* Right: User Details */}
                 <div className="flex-1">
                   <h3 className="font-bold text-lg">ID: {user.userid}</h3>
-                  <p className=" text-lg">{user.username}</p>
+                  <p className="text-lg font-semibold">{user.username}</p>
                   <p className="text-gray-600">Phone: {user.phonenumber}</p>
-                 
 
                   {/* Delete Button */}
-                  <div className="flex justify-start space-x-4 mt-2">
-                    <button
-                      onClick={() => setDeleteConfirm(user.userid)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setDeleteConfirm(user.userid)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 mt-3"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
@@ -123,7 +120,6 @@ export default function Users() {
           </div>
         )}
 
-      
         {deleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg">
